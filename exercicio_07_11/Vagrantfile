@@ -21,6 +21,7 @@ Vagrant.configure("2") do |config|
      sudo su
      apt install -y docker.io
      mkdir /var/htdocs
-     docker run -dit -p 80:80 -v /var/htdocs:usr/local/apache2/htdocs/ httpd:2.4
+     chmod 755 /var/htdocs/ -R
+     docker run -d -p 80:80 -v /var/htdocs:usr/local/apache2/htdocs/ httpd:2.4
    SHELL
 end
