@@ -1,0 +1,63 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+ 
+  config.vm.define "vm1" do |vm1|
+
+    vm1.vm.hostname = "vm1"
+    vm1.vm.box = "ubuntu/focal64"
+    vm1.vm.network "forwarded_port", guest: 90, host: 9090, host_ip: "192.168.56.10"
+    vm1.vm.network "private_network", ip: "192.168.56.10"
+    vm1.vm.synced_folder "./htdocs", "/var/htdocs"
+    end
+    
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = "2"
+      config.vm.provision "shell", inline: <<-SHELL
+      apt update
+       sudo su
+       apt install -y docker.io
+       docker run -d -p 90:80 -v /var/htdocs/:/usr/local/apache2/htdocs/ httpd:2.4
+     SHELL
+    end
+  
+  ####################################################################################
+   config.vm.define "vm2" do |vm2|
+     vm2.vm.hostname = "vm2"
+     vm2.vm.box = "ubuntu/focal64"
+     vm2.vm.network "forwarded_port", guest: 81, host: 8181, host_ip: "192.168.56.20"
+     vm2.vm.network "private_network", ip: "192.168.56.20"
+     vm2.vm.synced_folder "./htdocs_db", "/var/htdocs"
+     end
+   
+     config.vm.provider "virtualbox" do |vb2|
+       vb2.memory = "1024"
+       vb2.cpus = "2"
+       config.vm.provision "shell", inline: <<-SHELL
+       apt update
+        sudo su
+        apt install -y docker.io
+        mkdir /var/htdocs
+        chmod 755 /var/htdocs/ -R
+        cd /var/htdocs
+      SHELL
+     end
+     ####################################################################################
+   config.vm.define "vm3" do |vm3|
+     vm3.vm.hostname = "vm3"
+     vm3.vm.box = "ubuntu/focal64"
+     vm3.vm.network "forwarded_port", guest: 82, host: 8282, host_ip: "192.168.56.30"
+     vm3.vm.network "private_network", ip: "192.168.56.30"
+     vm3.vm.synced_folder "./htdocs_db", "/var/htdocs"
+     end
+   
+     config.vm.provider "virtualbox" do |vb3|
+       vb3.memory = "1024"
+       vb3.cpus = "2"
+       config.vm.provision "shell", inline: <<-SHELL
+       apt-get update
+       SHELL
+     end
+end
